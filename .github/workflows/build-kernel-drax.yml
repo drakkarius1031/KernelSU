@@ -1,20 +1,20 @@
-name: Build Kernel - ChromeOS ARCVM
+name: Build Kernel - ChromeOS DRAX
 on:
   push:
     branches: ["main", "ci", "checkci"]
     paths:
-      - ".github/workflows/build-kernel-arcvm.yml"
+      - ".github/workflows/build-kernel-drax.yml"
       - "kernel/**"
   pull_request:
     branches: ["main"]
     paths:
-      - ".github/workflows/build-kernel-arcvm.yml"
+      - ".github/workflows/build-kernel-drax.yml"
       - "kernel/**"
   workflow_call:
   workflow_dispatch:
 
 env:
-  git_tag: chromeos-5.10-arcvm
+  git_tag: chromeos-5.10
 
 jobs:
   build:
@@ -25,13 +25,9 @@ jobs:
           - arch: x86_64
             kernel_image_name: bzImage
             build_config: build.config.gki.x86_64
-            defconfig: x86_64_arcvm_defconfig
-          - arch: arm64
-            kernel_image_name: Image
-            build_config: build.config.gki.aarch64
-            defconfig: arm64_arcvm_defconfig
+            defconfig: x86_64_defconfig
 
-    name: Build ChromeOS ARCVM kernel
+    name: Build ChromeOS DRAX kernel
     runs-on: ubuntu-20.04
     env:
       LTO: thin
@@ -80,7 +76,7 @@ jobs:
           VERSION=$(grep -E '^VERSION = ' Makefile | awk '{print $3}')
           PATCHLEVEL=$(grep -E '^PATCHLEVEL = ' Makefile | awk '{print $3}')
           SUBLEVEL=$(grep -E '^SUBLEVEL = ' Makefile | awk '{print $3}')
-          echo "ChromeOS ARCVM Linux kernel version: $VERSION.$PATCHLEVEL.$SUBLEVEL"
+          echo "ChromeOS DRAX Linux kernel version: $VERSION.$PATCHLEVEL.$SUBLEVEL"
           echo "version=$VERSION.$PATCHLEVEL.$SUBLEVEL" >> $GITHUB_ENV
 
       - name: Setup KernelSU
@@ -130,8 +126,8 @@ jobs:
           ls -l -h ${PWD}/arch/${ARCH}/boot
           echo "file_path=${PWD}/arch/${ARCH}/boot/${KERNEL_IMAGE_NAME}" >> $GITHUB_ENV
 
-      - name: Upload kernel-ARCVM-${{ matrix.arch }}-${{ env.version }}
+      - name: Upload kernel-DRAX-${{ matrix.arch }}-${{ env.version }}
         uses: actions/upload-artifact@v4
         with:
-          name: kernel-ARCVM-${{ matrix.arch }}-${{ env.version }}
+          name: kerneldrax-${{ matrix.arch }}-${{ env.version }}
           path: "${{ env.file_path }}"
